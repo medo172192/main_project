@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Http\Requests;
+namespace Backpack\NewsCRUD\app\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class TagRequest extends FormRequest
+class TagRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +23,7 @@ class TagRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+            'name' => 'required|min:2|max:255',
         ];
     }
 
