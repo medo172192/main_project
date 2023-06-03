@@ -15,7 +15,7 @@ class CategoryCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\ReorderOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\InlineCreateOperation;
-
+    use \Backpack\ReviseOperation\ReviseOperation;
     public function setup()
     {
         CRUD::setModel("Backpack\NewsCRUD\app\Models\Category");

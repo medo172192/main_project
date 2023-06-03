@@ -6,11 +6,13 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
 use Illuminate\Database\Eloquent\Model;
+use \Venturecraft\Revisionable\RevisionableTrait;
 
 class Article extends Model
 {
     use CrudTrait;
     use Sluggable, SluggableScopeHelpers;
+    use RevisionableTrait;
 
     /*
     |--------------------------------------------------------------------------
@@ -100,4 +102,17 @@ class Article extends Model
     | MUTATORS
     |--------------------------------------------------------------------------
     */
+
+
+    public function identifiableName()
+    {
+        return $this->name;
+    }
+
+    // If you are using another bootable trait
+    // be sure to override the boot method in your model
+    public static function boot()
+    {
+        parent::boot();
+    }
 }
