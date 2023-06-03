@@ -6,12 +6,11 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
-        "backpack/backupmanager": "*",
+        "backpack/backupmanager": "^3.0",
         "backpack/crud": "^5.6",
-        "backpack/editable-columns": "*",
-        "backpack/pagemanager": "*",
-        "backpack/permissionmanager": "*",
-        "backpack/pro": "*",
+        "backpack/pagemanager": "^3.0",
+        "backpack/permissionmanager": "^6.0",
+        "backpack/settings": "^3.0",
         "consoletvs/charts": "6.*",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
@@ -25,25 +24,26 @@
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {
-        "backpack/generators": "*",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
-        "laracasts/generators": "*",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^5.10",
-        "phpunit/phpunit": "^9.5.10"
+        "phpunit/phpunit": "^9.5.10",
+        "scrutinizer/ocular": "~1.1"
     },
     "autoload": {
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Backpack\\Settings\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Backpack\\Settings\\Test\\": "tests"
         }
     },
     "scripts": {
@@ -59,11 +59,18 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ]
+        ],
+        "test": "vendor/bin/phpunit --testdox"
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        },
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [],
+            "providers": [
+                "Backpack\\Settings\\SettingsServiceProvider"
+            ]
         }
     },
     "config": {
