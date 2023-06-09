@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\EmailVerification;
 use Illuminate\Support\Facades\Notification;
+use App\Models\User;
 
 class loginController extends Controller
 {
@@ -32,15 +33,15 @@ class loginController extends Controller
 
         // Check From Validation
         if(Api::InValid())
-            return Api::ErrorValidator();
+                return Api::ErrorValidator();
 
         // -Right Validation
         // Check User Exists
-        if ($token =  !Auth::attempt(request()->only(['email','password'])))
-            return Api::Render([
-                Api::Status()   => Api::Error(),
-                Api::Message()  => "The Email Or Password InValid"
-            ],Api::ErrorCode());
+        if (!Auth::attempt(request()->only(['email','password'])))
+                return Api::Render([
+                    Api::Status()   => Api::Error(),
+                    Api::Message()  => "The Email Or Password InValid"
+                ],Api::ErrorCode());
 
         // -This User Exists
         // find user
@@ -50,22 +51,21 @@ class loginController extends Controller
         if (!$user->hasVerifiedEmail())
                 // Send Verify User Mail
                 Notification::send($user, new EmailVerification($user));
-                return Api::Render([
+                return Api::RenderWithToken([
                     Api::Status()   => Api::success(),
-                    Api::Message()  => "",
-                    "token"         => ""
+                    Api::Message()  => "Make Verification Email ",
                 ],Api::SuccessCode());
 
 
         // user sign in and generate token
         Auth::login($user,true);
         Api::GenerateToken($user);
+        Api::saveToken(Api::Token());
 
         // success
-        return Api::Render([
+        return Api::RenderWithTokenGenerate([
             Api::Status()   => Api::Success(),
             Api::Message()  =>[],
-            "token"         => Api::Token()
         ],Api::SuccessCode());
 
     }

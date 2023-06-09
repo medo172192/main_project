@@ -8,7 +8,9 @@ use  App\Http\Controllers\TestController;
 use App\Http\Controllers\Api\Auth\Register\registerController;
 use App\Http\Controllers\Api\Auth\Login\loginController;
 use App\Http\Controllers\Api\Auth\Login\resetPasswordController;
-
+use App\Http\Controllers\Api\Auth\Token\tokenController;
+use App\Http\Controllers\Api\User\UserManagerController;
+use App\Http\Controllers\Api\Auth\Logout\logoutController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -38,5 +40,21 @@ Route::name('api.')
         // Reset Password Route
         Route::post('/reset/password',[resetPasswordController::class,'ReserPassword'])
             ->name('reset.password');
+
+        // Access Token
+        Route::get('/access/token',[tokenController::class,'token'])
+            ->name('token');
+
+        // Remoce Token
+        Route::post('/remove/token',[tokenController::class,'removeToken'])
+            ->name('remove.token');
+
+        // Remove Token
+        Route::post('/access/user/data',[UserManagerController::class,'getData'])
+        ->name('user.data');
+
+         // Remoce Token
+         Route::post('/logout',[logoutController::class,'logout'])
+         ->name('logout');
     });
 

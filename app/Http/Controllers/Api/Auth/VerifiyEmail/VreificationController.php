@@ -14,10 +14,10 @@ class VreificationController extends Controller
    public function VerifiyEmail(Request $request)
    {
         if (request()->method() != 'POST')
-            return Api::Render([
-                Api::Status() => Api::Error(),
-                Api::Message() => "you cant Access "
-            ],Api::ErrorCode());
+                return Api::Render([
+                    Api::Status() => Api::Error(),
+                    Api::Message() => "you cant Access "
+                ],Api::ErrorCode());
 
         $user  = User::where('id',$request->get('id'))->first();
         Api::GenerateToken($user);

@@ -34,20 +34,21 @@ class resetPasswordController extends Controller
 
         // The Input Rules Not Right
         if(Api::InValid())
-            return Api::ErrorValidator();
+                return Api::ErrorValidator();
 
         // Righe Rules
         // Check Form Email Exists
         if (!Auth::attempt(request()->only(['email']))){
-            return Api::Render([
-                Api::Status() => Api::Error(),
-                Api::Message()=> "The Email Not Found"
-            ],Api::ErrorCode());
+                return Api::Render([
+                    Api::Status() => Api::Error(),
+                    Api::Message()=> "The Email Not Found"
+                ],Api::ErrorCode());
         }
 
         $user = User::where('email',$request->input('email'))->first();
         $code = session()->flush('ResetPasswordCode',Hash::make(random_int(2000,10000000)));
         $code = session()->flush('ResetPasswordEmail', $user->email);
+
         //Send Mail
         Notification::send($user, new restPassword($user, session()->get('ResetPasswordCode')));
         return Api::Render([
@@ -67,19 +68,18 @@ class resetPasswordController extends Controller
 
         // The Input Rules Not Right
         if(Api::InValid())
-            return Api::ErrorValidator();
+                return Api::ErrorValidator();
 
         // Righe Rules
         $user = User::where('email',session()->get('ResetPasswordEmail'))->first();
 
         // Check From Code
-        if (session()->get('ResetPasswordCode') != $request->input('code')){
-            return Api::Render([
-                Api::Status()  => Api::Error(),
-                Api::Message() => 'The Code not Right!',
-                'token'        => ''
-            ],Api::ErrorCode());
-        }
+        if (session()->get('ResetPasswordCode') != $request->input('code'))
+                return Api::Render([
+                    Api::Status()  => Api::Error(),
+                    Api::Message() => 'The Code not Right!',
+                    'token'        => ''
+                ],Api::ErrorCode());
 
         // Code Right
         Api::GenerateToken($user);
@@ -104,7 +104,7 @@ class resetPasswordController extends Controller
             ]);
 
             if (Api::InValid())
-                return Api::ErrorValidator();
+                    return Api::ErrorValidator();
 
 
             $email = session()->get('ResetPasswordEmail');
@@ -113,17 +113,17 @@ class resetPasswordController extends Controller
 
             // Check Confirm Password
             if ($request->get('password') != $request->get('confirm_password'))
-                return Api::Render([
-                    Api::Status() => Api::Error(),
-                    Api::Message()=> 'The password not Confirmed'
-                ],Api::ErrorCode());
+                    return Api::Render([
+                        Api::Status() => Api::Error(),
+                        Api::Message()=> 'The password not Confirmed'
+                    ],Api::ErrorCode());
 
             // Check Token
             if ($request->input('token') != $token )
-                return Api::Render([
-                    Api::Status() => Api::Error(),
-                    Api::Message()=> 'The Token Not Right!'
-                ],Api::ErrorCode());
+                    return Api::Render([
+                        Api::Status() => Api::Error(),
+                        Api::Message()=> 'The Token Not Right!'
+                    ],Api::ErrorCode());
 
             // Change Password
             $user->update([

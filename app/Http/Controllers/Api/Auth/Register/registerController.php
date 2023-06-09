@@ -31,7 +31,6 @@ class registerController extends Controller
         DB::beginTransaction();
         try {
 
-
             Api::Validator($request->all(),[
                 "fname"     =>"required|string",
                 "lname"     =>"required|string",
@@ -40,24 +39,23 @@ class registerController extends Controller
                 "age"       =>"required|string",
                 "email"     =>"required|string|email|unique:users",
                 "password"  =>"required|string",
-                // "confirm_password" =>"required|string|confirmed"
             ]);
 
             // in Case There is Validation Errors
             if (Api::InValid())
-                return Api::ErrorValidator();
+                    return Api::ErrorValidator();
 
             // - Right Validation
             // Check User Token Exsists
-            if ($token = Auth::guard()->attempt(request()->only(['email','password']))){
-                Api::Render([
-                    Api::Status()   => Api::Error(),
-                    Api::Message()  => "The email has already been taken"
-                ],Api::ErrorCode());
-            }
+            if (Auth::attempt(request()->only(['email','password'])))
+                    return Api::Render([
+                        Api::Status()   => Api::Error(),
+                        Api::Message()  => Api::getToken()
+                    ],Api::ErrorCode());
+
             // - Token Not Found
             // Create User Account
-            $UserData = [
+            $UserData = collect([
                 'fname' =>$request->get('fname'),
                 'lname' =>$request->get('lname'),
                 'address' =>$request->get('address'),
@@ -65,31 +63,30 @@ class registerController extends Controller
                 'age' =>$request->get('age'),
                 'email' =>$request->get('email'),
                 'password' =>Hash::make($request->get('password')),
-            ];
-            $user = User::create($UserData);
+            ]);
+
+            $user = User::create($UserData->toArray());
 
             // Send Mail
             Notification::send($user, new EmailVerification($user));
 
             // Check User Logined
             if (Auth::guard('sanctum')->check())
-                return Api::Render([
-                    Api::Status()   => Api::Success(),
-                    Api::Message()  => "Make Email Verification",
-                    "token"         => Api::Token(),
-                ],Api::SuccessCode());
+                    return Api::RenderWithToken([
+                        Api::Status()   => Api::Success(),
+                        Api::Message()  => "Make Verification Email ",
+                    ],Api::SuccessCode());
 
             // user sign in and generate token
             Auth::login($user,true);
 
             Api::GenerateToken($user);
+            Api::saveToken(Api::Token());
 
-            
             DB::commit();
-            return Api::Render([
+            return Api::RenderWithTokenGenerate([
                 Api::Status()   => Api::Success(),
-                Api::Message()  => "Make Email Verification",
-                "token"         => Api::Token(),
+                Api::Message()  => "Make Verification Email ",
             ],Api::SuccessCode());
 
         } catch (\Exception $e) {
