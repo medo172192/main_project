@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Http\Controllers\Api\Auth\Login;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Http\Services\ApiManager\Api;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Notifications\EmailVerification;
+use Illuminate\Support\Facades\Notification;
+
+class loginController extends Controller
+{
+//     /*
+//     |--------------------------------------------------------------------------
+//     | Login Controller
+//     |--------------------------------------------------------------------------
+//     |
+//     | Here You Can access to Login Page Controller
+//     | Use Sanctum To Api Token
+//     |
+//     */
+
+    public function Login(Request $request)
+    {
+        // Login Validation
+        Api::Validator($request->all(),[
+            'email' =>"required|string|email",
+            'password'=>"required|string",
+        ]);
+
+        // Check From Validation
+        if(Api::InValid())
+            return Api::ErrorValidator();
+
+        // -Right Validation
+        // Check User Exists
+        if ($token =  !Auth::attempt(request()->only(['email','password'])))
+            return Api::Render([
+                Api::Status()   => Api::Error(),
+                Api::Message()  => "The Email Or Password InValid"
+            ],Api::ErrorCode());
+
+        // -This User Exists
+        // find user
+        $user  = User::where('email',$request->input('email'))->first();
+
+        // Check Email Verification
+        if (!$user->hasVerifiedEmail())
+                // Send Verify User Mail
+                Notification::send($user, new EmailVerification($user));
+                return Api::Render([
+                    Api::Status()   => Api::success(),
+                    Api::Message()  => "",
+                    "token"         => ""
+                ],Api::SuccessCode());
+
+
+        // user sign in and generate token
+        Auth::login($user,true);
+        Api::GenerateToken($user);
+
+        // success
+        return Api::Render([
+            Api::Status()   => Api::Success(),
+            Api::Message()  =>[],
+            "token"         => Api::Token()
+        ],Api::SuccessCode());
+
+    }
+
+
+}
